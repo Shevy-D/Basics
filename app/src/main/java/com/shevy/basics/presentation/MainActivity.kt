@@ -3,6 +3,7 @@ package com.shevy.basics.presentation
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.shevy.basics.data.repository.UserRepositoryImpl
+import com.shevy.basics.data.storage.sharedprefs.SharedPrefUserStorage
 import com.shevy.basics.databinding.ActivityMainBinding
 import com.shevy.basics.domain.models.SaveUserNameParam
 import com.shevy.basics.domain.models.UserName
@@ -12,9 +13,9 @@ import com.shevy.basics.domain.usecase.SaveUserNameUseCase
 class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
 
-    private val userRepository = UserRepositoryImpl()
-    private val getUserNameUseCase = GetUserNameUseCase()
-    private val saveUserNameUseCase = SaveUserNameUseCase(userRepository)
+    private val userRepository by lazy (LazyThreadSafetyMode.NONE) {UserRepositoryImpl(SharedPrefUserStorage(applicationContext))}
+    private val getUserNameUseCase by lazy (LazyThreadSafetyMode.NONE) { GetUserNameUseCase(userRepository) }
+    private val saveUserNameUseCase by lazy (LazyThreadSafetyMode.NONE) { SaveUserNameUseCase(userRepository) }
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
