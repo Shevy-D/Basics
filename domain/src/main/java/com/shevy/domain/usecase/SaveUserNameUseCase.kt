@@ -1,7 +1,7 @@
-package com.shevy.basics.domain.usecase
+package com.shevy.domain.usecase
 
-import com.shevy.basics.domain.models.SaveUserNameParam
-import com.shevy.basics.domain.repository.UserRepository
+import com.shevy.domain.models.SaveUserNameParam
+import com.shevy.domain.repository.UserRepository
 
 class SaveUserNameUseCase(private val userRepository: UserRepository) {
 

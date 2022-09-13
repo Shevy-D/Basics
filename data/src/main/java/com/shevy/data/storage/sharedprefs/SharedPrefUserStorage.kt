@@ -1,9 +1,9 @@
-package com.shevy.basics.data.storage.sharedprefs
+package com.shevy.data.storage.sharedprefs
 
 import android.content.Context
-import com.shevy.basics.data.storage.UserStorage
-import com.shevy.basics.data.storage.models.User
-import com.shevy.basics.domain.models.UserName
+import com.shevy.data.storage.UserStorage
+import com.shevy.data.storage.models.User
+import com.shevy.domain.models.UserName
 
 private const val SHARED_PREFS_NAME = "shared_prefs_name"
 private const val KEY_FIRST_NAME = "firstName"

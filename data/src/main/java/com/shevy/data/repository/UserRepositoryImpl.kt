@@ -1,10 +1,10 @@
-package com.shevy.basics.data.repository
+package com.shevy.data.repository
 
-import com.shevy.basics.data.storage.models.User
-import com.shevy.basics.data.storage.UserStorage
-import com.shevy.basics.domain.models.SaveUserNameParam
-import com.shevy.basics.domain.models.UserName
-import com.shevy.basics.domain.repository.UserRepository
+import com.shevy.data.storage.UserStorage
+import com.shevy.data.storage.models.User
+import com.shevy.domain.models.SaveUserNameParam
+import com.shevy.domain.models.UserName
+import com.shevy.domain.repository.UserRepository
 
 class UserRepositoryImpl(private val userStorage: UserStorage) : UserRepository {
 
@@ -19,7 +19,7 @@ class UserRepositoryImpl(private val userStorage: UserStorage) : UserRepository 
         return mapToDomain(user)
     }
 
-    private fun mapToDomain(user: User): UserName {
+    private fun mapToDomain(user: UserName): UserName {
         return UserName(user.firstName, user.lastName)
     }
 
