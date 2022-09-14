@@ -1,23 +1,20 @@
 package com.shevy.basics.app
 
 import android.app.Application
-import com.shevy.basics.di.appModule
-import com.shevy.basics.di.dataModule
-import com.shevy.basics.di.domainModule
-import org.koin.android.ext.koin.androidContext
-import org.koin.android.ext.koin.androidLogger
-import org.koin.core.context.startKoin
-import org.koin.core.logger.Level
+import com.shevy.basics.di.AppComponent
+import com.shevy.basics.di.AppModule
+import com.shevy.basics.di.DaggerAppComponent
 
-class App: Application() {
+class App : Application() {
+
+    lateinit var appComponent: AppComponent
 
     override fun onCreate() {
         super.onCreate()
 
-        startKoin {
-            androidLogger(Level.DEBUG)
-            androidContext(this@App)
-            modules(listOf(appModule, domainModule, dataModule))
-        }
+        appComponent = DaggerAppComponent
+            .builder()
+            .appModule(AppModule(context = this))
+            .build()
     }
 }

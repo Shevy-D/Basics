@@ -1,16 +1,22 @@
 package com.shevy.basics.di
 
+import com.shevy.domain.repository.UserRepository
 import com.shevy.domain.usecase.GetUserNameUseCase
 import com.shevy.domain.usecase.SaveUserNameUseCase
-import org.koin.dsl.module
+import dagger.Module
+import dagger.Provides
 
-val domainModule = module {
+@Module
+class DomainModule {
 
-    factory<GetUserNameUseCase> {
-        GetUserNameUseCase(userRepository = get())
+    @Provides
+    fun provideGetUserNameUseCase(userRepository: UserRepository): GetUserNameUseCase {
+        return GetUserNameUseCase(userRepository = userRepository)
     }
 
-    factory<SaveUserNameUseCase> {
-        SaveUserNameUseCase(userRepository = get())
+    @Provides
+    fun provideSaveUserNameUseCase(userRepository: UserRepository): SaveUserNameUseCase {
+        return SaveUserNameUseCase(userRepository = userRepository)
     }
+
 }
