@@ -5,8 +5,11 @@ import com.shevy.domain.usecase.GetUserNameUseCase
 import com.shevy.domain.usecase.SaveUserNameUseCase
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ViewModelComponent
 
 @Module
+@InstallIn(ViewModelComponent::class)
 class DomainModule {
 
     @Provides
@@ -18,5 +21,4 @@ class DomainModule {
     fun provideSaveUserNameUseCase(userRepository: UserRepository): SaveUserNameUseCase {
         return SaveUserNameUseCase(userRepository = userRepository)
     }
-
 }

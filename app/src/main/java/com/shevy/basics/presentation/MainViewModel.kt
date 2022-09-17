@@ -8,10 +8,13 @@ import com.shevy.domain.models.SaveUserNameParam
 import com.shevy.domain.models.UserName
 import com.shevy.domain.usecase.GetUserNameUseCase
 import com.shevy.domain.usecase.SaveUserNameUseCase
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class MainViewModel(
-    private val getUserNameUseCase: GetUserNameUseCase,
-    private val saveUserNameUseCase: SaveUserNameUseCase
+@HiltViewModel
+class MainViewModel @Inject constructor(
+    val getUserNameUseCase: GetUserNameUseCase,
+    val saveUserNameUseCase: SaveUserNameUseCase
 ) : ViewModel() {
 
     private var resultLiveMutable = MutableLiveData<String>()
