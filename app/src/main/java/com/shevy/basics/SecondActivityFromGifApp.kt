@@ -11,6 +11,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -49,9 +50,8 @@ class SecondActivityFromGifApp : AppCompatActivity() {
     }
 
     private fun askPermissions() {
-/*        Метод ContextCompat.CheckSelfPermission спользуется
-          для проверки того, предоставлено ли определенное
-          разрешение Этот метод возвращает перечисление
+/*        Проверка текущего статуса разрешения выполняется методом
+          checkSelfPermission Этот метод возвращает перечисление
           Android.Content.PM.Permission , которое имеет
           одно из двух значений:
 
@@ -62,13 +62,13 @@ class SecondActivityFromGifApp : AppCompatActivity() {
                 this,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE
             ) != PackageManager.PERMISSION_GRANTED   //==PackageManager.PERMISSION_DENIED
-        ) {
-            /*
-            Метод ActivityCompat.ShouldShowRequestPermissionRationale
-            используется для определения того, следует ли показывать
-            пользователю обоснование. Этот метод возвращается true,
-            если должно отображаться обоснование для данного разрешения.
-             */
+        ) { /*
+            Метод shouldShowRequestPermissionRationale передаете название разрешения,
+            а он вам в виде boolean ответит, надо ли показывать объяснение для пользователя.
+
+            Чтобы решить, надо ли показывать объяснение пользователю. Если не надо, то
+            делаете запрос разрешения. А если надо, то показываете ваш диалог с
+            объяснением, а после этого диалога делаете запрос разрешения.*/
             if (ActivityCompat.shouldShowRequestPermissionRationale(
                     this,
                     Manifest.permission.WRITE_EXTERNAL_STORAGE
@@ -79,7 +79,7 @@ class SecondActivityFromGifApp : AppCompatActivity() {
                     .setMessage("Permission required to save photos from the Web.")
                     .setPositiveButton("Accept") { dialog, id ->
                         /*
-                        Если пользователь предоставляет разрешение, необходимо вызвать метод
+                        Если разрешения нет, то нам надо его запросить. Это выполняется методом
                         ActivityCompat.RequestPermissions(activity: Activity,
                         permissions: Array, requestCode: Int)
                         Для этого метода требуются следующие параметры:
@@ -114,18 +114,46 @@ class SecondActivityFromGifApp : AppCompatActivity() {
         }
     }
 
+    //Получаем разрешение пользователя
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+/*      Проверяем, что requestСode тот же, что мы указывали в requestPermissions.
+        В массиве permissions придут название разрешений, которые мы запрашивали.
+        В массиве grantResults придут ответы пользователя на запросы разрешений.
+*/
+        when (requestCode) {
+            MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE -> {
+                if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                    downloadImage(url)
+                }
+                return
+            }
+            else -> {}
+        }
+    }
+
     var msg: String? = ""
     var lastMsg = ""
 
     private fun downloadImage(url: String) {
-        //DIRECTORY_PICTURES – это стандартный каталог, в котором
-        //размещаются изображения, доступные пользователю.
+/*      DIRECTORY_PICTURES – это стандартный каталог, в котором
+        размещаются изображения, доступные пользователю.*/
         val directory = File(Environment.DIRECTORY_PICTURES)
 
         if (!directory.exists()) {
             directory.mkdir()  //make directory
         }
 
+        //Метод getSystemService используется для получения различных системных служб
+        /* Класс android.app.DownloadManager, который является системным сервисом
+        и позволяет загружать файлы в фоновом режиме (начиная с API 9).
+        Доступ к данному менеджеру осуществляется через вызов метода
+        getSystemService(String) с константой DOWNLOAD_SERVICE.*/
         val downloadManager = this.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
 
         //Класс Request может устанавливать некоторые свойства загрузки
@@ -138,6 +166,9 @@ class SecondActivityFromGifApp : AppCompatActivity() {
                 .setTitle(url.substring(url.lastIndexOf("/") + 1))
                 //Устанавливаем описание уведомления
                 .setDescription("")
+
+                .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+
                 //Установливаем пункт назначения во внешнем публичном каталоге
                 .setDestinationInExternalPublicDir(
                     //Место хранения загруженных файлов Папка загрузки SD-карты
@@ -147,7 +178,7 @@ class SecondActivityFromGifApp : AppCompatActivity() {
                 )
         }
 
-        //Каждому загруженному файлу соответствует идентификатор, по которому можно запрашивать данные.
+        //Ставим в очередь загрузку, используя enqueue() метод. Это вернет нам идентификатор загрузки.
         val downloadId = downloadManager.enqueue(request)
 /*      В процессе загрузки DownloadManager соответствующие данные сохраняются в
         базе данных. Если вам нужно получить соответствующую информацию о данных,
@@ -173,7 +204,8 @@ class SecondActivityFromGifApp : AppCompatActivity() {
                 msg = statusMessage(url, directory, status)
                 if (msg != lastMsg) {
                     withContext(Dispatchers.Main) {
-                        Toast.makeText(this@SecondActivityFromGifApp, msg, Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@SecondActivityFromGifApp, msg, Toast.LENGTH_SHORT)
+                            .show()
                     }
                     lastMsg = msg ?: ""
                 }

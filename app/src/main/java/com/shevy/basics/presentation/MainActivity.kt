@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import com.shevy.basics.databinding.ActivityMainBinding
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
